@@ -14,7 +14,9 @@ server_scripts {
 }
 
 shared_scripts {
-    'shared/config.lua'
+    'locale/*.lua',
+    'shared/config.lua',
+    'shared/locale.lua'
 }
 
 ui_page 'html/ui.html'

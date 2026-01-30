@@ -1,4 +1,5 @@
 Config = {
+    Locale = "en", -- Locale: "en" | "fr" | "es" | "bn"
     ServerCallbacks = {},
     FrameworkSettings = {
         CoreName = "qb-core", -- qb-core, es_extended, qbx_core, custom
@@ -9,6 +10,11 @@ Config = {
         },
     },
     BlackMarketSettings = {
+        Time = {
+            Enabled = true, -- true or false
+            OpenTime = 10, -- 24 hour format
+            CloseTime = 18, -- 24 hour format
+        },
         contacts = {
             {
                 id = "snake",
