@@ -6,8 +6,22 @@ local Cache = {
     peds = {},
     blips = {},
     targetZones = {},
+    ServerCallbacks = {}
 }
 FW = {}
+
+function TriggerCallback(name, cb, ...)
+    Cache.ServerCallbacks[name] = cb
+    TriggerServerEvent('J0-BurnerPhone:server:triggerCallback', name, ...)
+end
+
+RegisterNetEvent('J0-BurnerPhone:client:triggerCallback', function(name, ...)
+    if Cache.ServerCallbacks[name] then
+        Cache.ServerCallbacks[name](...)
+        Cache.ServerCallbacks[name] = nil
+    end
+end)
+
 FW.SendNuiMessage = function(action, data, bool)
     SetNuiFocus(bool, bool)
     SendNUIMessage({

@@ -1,26 +1,10 @@
-const DATA = {
-    contacts: [
-        {
-            id: 'snake',
-            name: 'SNAKE',
-            items: [
-                { name: 'COLT 1911', price: 2500 },
-                { name: 'UZI', price: 7500 },
-                { name: 'AMMO BOX', price: 400 }
-            ]
-        },
-        {
-            id: 'ghost',
-            name: 'GHOST',
-            items: [
-                { name: 'LOCKPICK', price: 150 },
-                { name: 'LAPTOP', price: 5000 },
-                { name: 'DRILL', price: 1200 }
-            ]
-        }
-    ],
-    replies: ['SHOW ME WHAT YOU GOT', 'WHO ARE YOU?', 'NEVERMIND']
-};
+let DATA = {};
+
+const REPLIES = [
+    "SHOW ME WHAT YOU GOT",
+    "WHO ARE YOU?",
+    "NEVERMIND"
+];
 
 let state = {
     view: 'CONTACTS',
@@ -43,7 +27,7 @@ function draw() {
         $content.append(`<div class="view-header">CONTACTS</div>`);
 
         let list = $('<div class="item-list"></div>');
-        DATA.contacts.forEach((c,i)=>{
+        (DATA.contacts || []).forEach((c,i)=>{
             list.append(`<div class="list-row ${state.index===i?'selected':''}">${c.name}</div>`);
         });
         $content.append(list);
@@ -71,7 +55,7 @@ function draw() {
         drawChatBg();
 
         let tray = $('<div class="action-tray"></div>');
-        DATA.replies.forEach((r,i)=>{
+        REPLIES.forEach((r,i)=>{
             tray.append(`<div class="list-row ${state.index===i?'selected':''}">${r}</div>`);
         });
         $content.append(tray);
@@ -84,7 +68,7 @@ function draw() {
         $content.append(`<div class="view-header">STOCK LIST</div>`);
 
         let list = $('<div class="item-list"></div>');
-        state.contact.items.forEach((it,i)=>{
+        (state.contact && state.contact.items || []).forEach((it,i)=>{
             list.append(`
                 <div class="list-row ${state.index===i?'selected':''}">
                     <span>${it.name}</span>
@@ -127,9 +111,9 @@ function input(key) {
     let back = ['Backspace','Escape','q','Q','a','A'];
 
     let max = 0;
-    if (state.view === 'CONTACTS') max = DATA.contacts.length;
-    if (state.view === 'REPLY') max = DATA.replies.length;
-    if (state.view === 'CATALOG') max = state.contact.items.length;
+    if (state.view === 'CONTACTS') max = (DATA.contacts || []).length;
+    if (state.view === 'REPLY') max = REPLIES.length;
+    if (state.view === 'CATALOG') max = (state.contact && state.contact.items || []).length;
 
     if (up.includes(key) && max)
         state.index = state.index>0 ? state.index-1 : max-1;
@@ -139,7 +123,7 @@ function input(key) {
 
     if (ok.includes(key)) {
         if (state.view === 'CONTACTS') {
-            state.contact = DATA.contacts[state.index];
+            state.contact = (DATA.contacts || [])[state.index];
             state.chat = [{from:'dealer',text:'YO. WHAT YOU NEED?'}];
             state.view = 'CHAT';
             state.index = 0;
@@ -149,7 +133,7 @@ function input(key) {
             state.index = 0;
         }
         else if (state.view === 'REPLY') {
-            let r = DATA.replies[state.index];
+            let r = REPLIES[state.index];
             state.chat.push({from:'me',text:r});
             state.view = 'CHAT';
             state.typing = true;
@@ -171,7 +155,7 @@ function input(key) {
             },1000);
         }
         else if (state.view === 'CATALOG') {
-            state.item = state.contact.items[state.index];
+            state.item = (state.contact && state.contact.items || [])[state.index];
             state.view = 'CONFIRM';
         }
         else if (state.view === 'CONFIRM') {
@@ -204,12 +188,11 @@ setInterval(()=>{
     );
 },1000);
 
-draw();
-
-
 window.addEventListener('message', function(event) {
     if (event.data.action === 'openBurnerPhone') {
         document.querySelector('body').style.display = 'flex';
+        DATA = event.data.data || {};
+        draw();
     }
 });
 

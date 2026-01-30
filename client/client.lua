@@ -1,4 +1,3 @@
 RegisterCommand("openBurnerPhone", function()
-    print("Opening Burner Phone")
-    FW.SendNuiMessage('openBurnerPhone', nil, true)
+    FW.SendNuiMessage('openBurnerPhone', Config.BlackMarketSettings, true)
 end)

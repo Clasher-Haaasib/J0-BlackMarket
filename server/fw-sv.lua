@@ -1,7 +1,27 @@
 local C, s = Config.FrameworkSettings.CoreName, function(r) return GetResourceState(r) == 'started' end
 local isESX, isQB, Core = C == "es_extended", C:find("qb"), (C == "es_extended" and exports[C]:getSharedObject() or exports[C]:GetCoreObject())
 local hasOx, hasQs, hasCodem, hasEsx = s('ox_inventory'), s('qs-inventory'), s('codem-inventory'), s('esx_inventoryhud')
+local Cache = {
+    ServerCallbacks = {}
+}
+
 FW = {}
+
+function CreateCallback(name, cb)
+    Cache.ServerCallbacks[name] = cb
+end
+
+function TriggerCallback(name, source, cb, ...)
+    if not Cache.ServerCallbacks[name] then return end
+    Cache.ServerCallbacks[name](source, cb, ...)
+end
+
+RegisterNetEvent('J0-BurnerPhone:server:triggerCallback', function(name, ...)
+    local src = source
+    TriggerCallback(name, src, function(...)
+        TriggerClientEvent('J0-BurnerPhone:client:triggerCallback', src, name, ...)
+    end, ...)
+end)
 
 FW.GetPlayer = function(src)
     return isQB and Core.Functions.GetPlayer(src) or isESX and Core.GetPlayerFromId(src) or nil
