@@ -1,5 +1,5 @@
 Config = {
-    Locale = "en", -- Locale: "en" | "fr" | "es" | "bn"
+    Locale = "bn", -- Locale: "en" | "fr" | "es" | "bn"
     ServerCallbacks = {},
     FrameworkSettings = {
         CoreName = "qb-core", -- qb-core, es_extended, qbx_core, custom

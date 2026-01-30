@@ -12,7 +12,7 @@ const FALLBACK = {
 };
 
 function t(key, replacements) {
-    let s = (LOCALE && LOCALE[key]) || FALLBACK[key] || key;
+    let s = LOCALE[key] || FALLBACK[key] || key;
     if (replacements) for (const [k, v] of Object.entries(replacements)) s = s.replace(k, String(v));
     return s;
 }
@@ -41,9 +41,8 @@ function draw() {
     if (state.isClosed) {
         $('#btn-left').text('');
         $('#btn-right').text(t('exit'));
-        const timeCfg = DATA.Time || {};
-        const open = (timeCfg.OpenTime != null ? timeCfg.OpenTime : 10).toString().padStart(2, '0');
-        const close = (timeCfg.CloseTime != null ? timeCfg.CloseTime : 18).toString().padStart(2, '0');
+        const open = (DATA.Time.OpenTime || 10).toString().padStart(2, '0');
+        const close = (DATA.Time.CloseTime || 18).toString().padStart(2, '0');
         $content.append(`
             <div class="view-header">${t('market_closed')}</div>
             <div style="text-align:center;padding:24px;font-size:14px;line-height:1.6">
@@ -60,7 +59,7 @@ function draw() {
         $content.append(`<div class="view-header">${t('contacts')}</div>`);
 
         let list = $('<div class="item-list"></div>');
-        (DATA.contacts || []).forEach((c,i)=>{
+        DATA.contacts.forEach((c,i)=>{
             list.append(`<div class="list-row ${state.index===i?'selected':''}">${c.name}</div>`);
         });
         $content.append(list);
@@ -101,7 +100,7 @@ function draw() {
         $content.append(`<div class="view-header">${t('stock_list')}</div>`);
 
         let list = $('<div class="item-list"></div>');
-        (state.contact && state.contact.items || []).forEach((it,i)=>{
+        state.contact.items.forEach((it,i)=>{
             list.append(`
                 <div class="list-row ${state.index===i?'selected':''}">
                     <span>${it.name}</span>
@@ -152,9 +151,9 @@ function input(key) {
     let back = ['Backspace','Escape','q','Q','a','A'];
 
     let max = 0;
-    if (state.view === 'CONTACTS') max = (DATA.contacts || []).length;
+    if (state.view === 'CONTACTS') max = DATA.contacts.length;
     if (state.view === 'REPLY') max = getReplies().length;
-    if (state.view === 'CATALOG') max = (state.contact && state.contact.items || []).length;
+    if (state.view === 'CATALOG') max = state.contact.items.length;
 
     if (up.includes(key) && max)
         state.index = state.index>0 ? state.index-1 : max-1;
@@ -164,7 +163,7 @@ function input(key) {
 
     if (ok.includes(key)) {
         if (state.view === 'CONTACTS') {
-            state.contact = (DATA.contacts || [])[state.index];
+            state.contact = DATA.contacts[state.index];
             state.chat = [{from:'dealer',text: t('dealer_what_need')}];
             state.view = 'CHAT';
             state.index = 0;
@@ -196,7 +195,7 @@ function input(key) {
             },1000);
         }
         else if (state.view === 'CATALOG') {
-            state.item = (state.contact && state.contact.items || [])[state.index];
+            state.item = state.contact.items[state.index];
             state.view = 'CONFIRM';
         }
         else if (state.view === 'CONFIRM') {
@@ -234,12 +233,10 @@ function updateClock() {
         method: 'POST',
         body: JSON.stringify({})
     }).then(r => r.json()).then(data => {
-        if (data && data.hour24 != null && data.minute != null) {
-            $('#clock').text(
-                data.hour24.toString().padStart(2, '0') + ':' +
-                data.minute.toString().padStart(2, '0')
-            );
-        }
+        $('#clock').text(
+            data.hour24.toString().padStart(2, '0') + ':' +
+            data.minute.toString().padStart(2, '0')
+        );
     }).catch(() => {});
 }
 updateClock();
@@ -248,17 +245,16 @@ setInterval(updateClock, 1000);
 window.addEventListener('message', function(event) {
     if (event.data.action === 'openBurnerPhone') {
         document.querySelector('body').style.display = 'flex';
-        DATA = event.data.data || {};
-        LOCALE = event.data.locale || {};
+        const payload = event.data.data;
+        DATA = payload.data || payload;
+        LOCALE = payload.locale || {};
         state = { view: 'CONTACTS', index: 0, contact: null, chat: [], typing: false, item: null, isClosed: false };
 
-        const timeCfg = DATA.Time;
-        if (timeCfg && timeCfg.Enabled) {
+        if (DATA.Time && DATA.Time.Enabled) {
             fetch(`https://${GetParentResourceName()}/getTime`, { method: 'POST', body: JSON.stringify({}) })
                 .then(r => r.json())
                 .then(data => {
-                    const hour = data && data.hour24 != null ? data.hour24 : 12;
-                    state.isClosed = !isWithinOpenHours(hour, timeCfg.OpenTime ?? 10, timeCfg.CloseTime ?? 18);
+                    state.isClosed = !isWithinOpenHours(data.hour24, DATA.Time.OpenTime, DATA.Time.CloseTime);
                     draw();
                 })
                 .catch(() => { state.isClosed = false; draw(); });

@@ -1,11 +1,11 @@
 RegisterCommand("openBurnerPhone", function()
     FW.SendNuiMessage('openBurnerPhone', {
         data = Config.BlackMarketSettings,
-        locale = L or {}
+        locale = L
     }, true)
 end)
 
-RegisterNuiCallback('closeUi', function(data)
+RegisterNuiCallback('closeUi', function()
     SetNuiFocus(false, false)
 end)
 
