@@ -206,3 +206,10 @@ setInterval(()=>{
 
 draw();
 
+
+window.addEventListener('message', function(event) {
+    if (event.data.action === 'openBurnerPhone') {
+        document.querySelector('body').style.display = 'flex';
+    }
+});
+
