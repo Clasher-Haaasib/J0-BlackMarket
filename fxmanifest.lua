@@ -5,7 +5,8 @@ author 'mfhasib'
 description 'qb-core community clash blackmarket script'
 
 client_scripts {
-    'client/**/*.lua',
+    'client/fw-cl.lua',
+    'client/client.lua',
 }
 
 server_scripts {

@@ -228,7 +228,8 @@ FW.RemoveTarget = function(id, type)
     if hasOxTarget then
         if type == 'zone' then exports.ox_target:removeZone(id) end
     elseif hasQbTarget then
-        if type == 'zone' then exports['qb-target']:RemoveZone(id)
+        if type == 'zone' then
+            pcall(function() exports['qb-target']:RemoveBoxZone(id) end)
         elseif type == 'model' then exports['qb-target']:RemoveTargetModel(id) end
     elseif hasInteract then
         if type == 'zone' then exports.interact:RemoveInteraction(id)

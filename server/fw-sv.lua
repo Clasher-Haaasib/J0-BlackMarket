@@ -2,7 +2,7 @@ local C, s = Config.FrameworkSettings.CoreName, function(r) return GetResourceSt
 local isESX, isQB, Core = C == "es_extended", C:find("qb"), (C == "es_extended" and exports[C]:getSharedObject() or exports[C]:GetCoreObject())
 local hasOx, hasQs, hasCodem, hasEsx = s('ox_inventory'), s('qs-inventory'), s('codem-inventory'), s('esx_inventoryhud')
 local Cache = {
-    ServerCallbacks = {}
+    ServerCallbacks = {},
 }
 
 FW = {}
@@ -102,7 +102,9 @@ FW.AddItem = function(src, name, amt, meta)
     else
         local player = FW.GetPlayer(src)
         if player then
-            if isQB then player.Functions.AddItem(name, amt, meta and false or nil, meta)
+            if isQB then
+                player.Functions.AddItem(name, amt, meta and false or nil, meta)
+                result = true
             elseif isESX and hasEsx then result = player.addInventoryItem(name, amt) end
         end
     end
@@ -213,20 +215,18 @@ end
 FW.RegisterUsableItem = function(name)
     if hasQs then
         exports['qs-inventory']:CreateUsableItem(name, function(src, item)
-            if name == 'burner_phone' then TriggerClientEvent('J0-BlackMarket:client:openBurnerPhone', src) end
+            if name == 'burner_phone' then TriggerClientEvent('J0-J0-BlackMarket:client:openBurnerPhone', src) end
         end)
     elseif isQB then
         Core.Functions.CreateUseableItem(name, function(src, item)
-            if name == 'burner_phone' then TriggerClientEvent('J0-BlackMarket:client:openBurnerPhone', src) end
+            if name == 'burner_phone' then TriggerClientEvent('J0-J0-BlackMarket:client:openBurnerPhone', src) end
         end)
     elseif isESX then
         Core.RegisterUsableItem(name, function(src, item)
-            if name == 'burner_phone' then TriggerClientEvent('J0-BlackMarket:client:openBurnerPhone', src) end
+            if name == 'burner_phone' then TriggerClientEvent('J0-J0-BlackMarket:client:openBurnerPhone', src) end
         end)
     end
 end
-
-FW.RegisterUsableItem('burner_phone')
 
 
 FW.SendMail = function(subject, message, src)
@@ -258,12 +258,5 @@ FW.SendMail = function(subject, message, src)
         print('No email resource found, please set the EmailResource in the config.lua file to CUSTOM and add your own email resource')
     end
 end
-
-
-
-AddEventHandler('onResourceStop', function(resource)
-    if GetCurrentResourceName() ~= resource then return end
-   
-end)
 
 return FW

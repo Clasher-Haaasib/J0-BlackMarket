@@ -23,8 +23,15 @@ L_en = {
     reply_who_are_you = "WHO ARE YOU?",
     reply_nevermind = "NEVERMIND",
     dealer_get_lost = "GET LOST THEN.",
-    dealer_coords_sent = "COORDS SENT FOR {0}. CHECK YOUR GPS.",
+    dealer_coords_sent = "Coords sent for cash drop off. Go there and drop the cash.",
     -- Confirm
     purchase = "PURCHASE",
     for_price = "FOR ${0}?",
+    target_drop_cash = "Drop the cash",
+    phone_go_area = "Go there and collect the item.",
+    target_collect = "I collect it",
+    done_business = "Done business with you.",
+    not_enough_cash = "Not enough cash.",
+    order_drop_cash = "Go there and drop off the cash.",
+    order_collect_item = "Go there and collect your item.",
 }

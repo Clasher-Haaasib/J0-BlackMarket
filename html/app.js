@@ -2,19 +2,11 @@ let DATA = {};
 let LOCALE = {};
 
 const REPLY_KEYS = ['reply_show_what', 'reply_who_are_you', 'reply_nevermind'];
-const FALLBACK = {
-    select: "SELECT", back: "BACK", open: "OPEN", exit: "EXIT", reply: "REPLY", send: "SEND", cancel: "CANCEL",
-    buy: "BUY", yes: "YES", no: "NO", contacts: "CONTACTS", stock_list: "STOCK LIST", confirm: "CONFIRM",
-    market_closed: "MARKET CLOSED", come_back_between: "Come back between", typing: "TYPING...",
-    dealer_what_need: "YO. WHAT YOU NEED?", reply_show_what: "SHOW ME WHAT YOU GOT", reply_who_are_you: "WHO ARE YOU?",
-    reply_nevermind: "NEVERMIND", dealer_get_lost: "GET LOST THEN.", dealer_coords_sent: "COORDS SENT FOR {0}. CHECK YOUR GPS.",
-    purchase: "PURCHASE", for_price: "FOR ${0}?"
-};
 
 function t(key, replacements) {
-    let s = LOCALE[key] || FALLBACK[key] || key;
-    if (replacements) for (const [k, v] of Object.entries(replacements)) s = s.replace(k, String(v));
-    return s;
+    let s = LOCALE[key];
+    if (s && replacements) for (const [k, v] of Object.entries(replacements)) s = s.replace(new RegExp(k.replace(/[{}]/g, '\\$&'), 'g'), String(v));
+    return s || key;
 }
 
 function getReplies() { return REPLY_KEYS.map(k => t(k)); }
@@ -199,11 +191,21 @@ function input(key) {
             state.view = 'CONFIRM';
         }
         else if (state.view === 'CONFIRM') {
-            state.chat.push({
-                from:'dealer',
-                text: t('dealer_coords_sent', {'{0}': state.item.name})
-            });
-            state.view = 'CHAT';
+            fetch(`https://${GetParentResourceName()}/confirmPurchase`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    contactId: state.contact.id,
+                    itemName: state.item.itemName,
+                    itemDisplayName: state.item.name,
+                    price: state.item.price
+                })
+            }).then(r => r.json()).then(success => {
+                if (success) {
+                    state.chat.push({ from: 'dealer', text: t('dealer_coords_sent') });
+                    state.view = 'CHAT';
+                }
+                draw();
+            }).catch(() => draw());
         }
     }
 
@@ -243,12 +245,33 @@ updateClock();
 setInterval(updateClock, 1000);
 
 window.addEventListener('message', function(event) {
+    if (event.data.action === 'blackmarketReset') {
+        state = { view: 'CONTACTS', index: 0, contact: null, chat: [], typing: false, item: null, isClosed: state.isClosed || false };
+        draw();
+        return;
+    }
     if (event.data.action === 'openBurnerPhone') {
         document.querySelector('body').style.display = 'flex';
-        const payload = event.data.data;
+        const payload = event.data.data || event.data;
         DATA = payload.data || payload;
         LOCALE = payload.locale || {};
-        state = { view: 'CONTACTS', index: 0, contact: null, chat: [], typing: false, item: null, isClosed: false };
+        const activeOrder = payload.activeOrder;
+        if (activeOrder) {
+            state = {
+                view: 'CHAT',
+                index: 0,
+                contact: { id: 'dealer', name: 'DEALER' },
+                chat: [
+                    { from: 'dealer', text: t('dealer_what_need') },
+                    { from: 'dealer', text: activeOrder.message }
+                ],
+                typing: false,
+                item: null,
+                isClosed: false
+            };
+        } else {
+            state = { view: 'CONTACTS', index: 0, contact: null, chat: [], typing: false, item: null, isClosed: false };
+        }
 
         if (DATA.Time && DATA.Time.Enabled) {
             fetch(`https://${GetParentResourceName()}/getTime`, { method: 'POST', body: JSON.stringify({}) })
