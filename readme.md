@@ -16,6 +16,7 @@ Place after your framework, inventory, and target resources.
 - Add item to `qb-core/shared/items.lua` (or your items config)
 - Copy `install/images/burner_phone.png` to `qb-inventory/html/images/`
 
+```lua
 ['burner_phone'] = {
     ['name'] = 'burner_phone',
     ['label'] = 'Burner Phone',
@@ -28,11 +29,12 @@ Place after your framework, inventory, and target resources.
     ['combinable'] = nil,
     ['description'] = 'An untraceable phone used for black market contacts.'
 },
-
+```
 **ox_inventory**
 - Add item to `ox_inventory/data/items.lua`
 - Copy `install/images/burner_phone.png` to `ox_inventory/web/images/`
 
+```lua
 ['burner_phone'] = {
     label = 'Burner Phone',
     weight = 200,
@@ -40,7 +42,7 @@ Place after your framework, inventory, and target resources.
     close = true,
     description = 'An untraceable phone used for black market contacts.'
 },
-
+```
 ### 3. Configure
 
 Edit `shared/config.lua` for contacts, locations, times, and dispatch.
