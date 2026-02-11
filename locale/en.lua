@@ -14,6 +14,7 @@ L_en = {
     contacts = "CONTACTS",
     stock_list = "STOCK LIST",
     confirm = "CONFIRM",
+    loading = "LOADING...",
     market_closed = "MARKET CLOSED",
     come_back_between = "Come back between",
     -- Chat / flow

@@ -12,6 +12,7 @@ L_bn = {
     contacts = "যোগাযোগ",
     stock_list = "স্টক তালিকা",
     confirm = "নিশ্চিত করুন",
+    loading = "লোড হচ্ছে...",
     market_closed = "বাজার বন্ধ",
     come_back_between = "এই সময়ে আসুন",
     typing = "টাইপ করছি...",

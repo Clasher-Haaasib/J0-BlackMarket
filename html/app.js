@@ -5,7 +5,7 @@ const REPLY_KEYS = ['reply_show_what', 'reply_who_are_you', 'reply_nevermind'];
 
 function t(key, replacements) {
     let s = LOCALE[key];
-    if (s && replacements) for (const [k, v] of Object.entries(replacements)) s = s.replace(new RegExp(k.replace(/[{}]/g, '\\$&'), 'g'), String(v));
+    if (s && replacements) for (const [k, v] of Object.entries(replacements)) s = s.replace(new RegExp(k.replace(/\$|\{|\}/g, '\\$&'), 'g'), String(v));
     return s || key;
 }
 
@@ -17,7 +17,8 @@ let state = {
     contact: null,
     chat: [],
     typing: false,
-    item: null
+    item: null,
+    loading: false
 };
 
 const $content = $('#main-content');
@@ -104,17 +105,20 @@ function draw() {
     }
 
     if (state.view === 'CONFIRM') {
-        $('#btn-left').text(t('yes'));
-        $('#btn-right').text(t('no'));
-
+        $('#btn-left').text(state.loading ? '' : t('yes'));
+        $('#btn-right').text(state.loading ? '' : t('no'));
         $content.append(`<div class="view-header">${t('confirm')}</div>`);
-        $content.append(`
-            <div style="text-align:center;padding:20px;font-size:14px">
-                ${t('purchase')}<br>
-                <b>${state.item.name}</b><br>
-                ${t('for_price', { '${0}': state.item.price })}
-            </div>
-        `);
+        if (state.loading) {
+            $content.append(`<div class="loading-block">${t('loading')}</div>`);
+        } else {
+            $content.append(`
+                <div style="text-align:center;padding:20px;font-size:14px">
+                    ${t('purchase')}<br>
+                    <b>${state.item.name}</b><br>
+                    ${t('for_price', { '${0}': state.item.price })}
+                </div>
+            `);
+        }
     }
 }
 
@@ -191,6 +195,8 @@ function input(key) {
             state.view = 'CONFIRM';
         }
         else if (state.view === 'CONFIRM') {
+            state.loading = true;
+            draw();
             fetch(`https://${GetParentResourceName()}/confirmPurchase`, {
                 method: 'POST',
                 body: JSON.stringify({
@@ -200,12 +206,13 @@ function input(key) {
                     price: state.item.price
                 })
             }).then(r => r.json()).then(success => {
+                state.loading = false;
                 if (success) {
                     state.chat.push({ from: 'dealer', text: t('dealer_coords_sent') });
                     state.view = 'CHAT';
                 }
                 draw();
-            }).catch(() => draw());
+            }).catch(() => { state.loading = false; draw(); });
         }
     }
 
@@ -246,7 +253,7 @@ setInterval(updateClock, 1000);
 
 window.addEventListener('message', function(event) {
     if (event.data.action === 'blackmarketReset') {
-        state = { view: 'CONTACTS', index: 0, contact: null, chat: [], typing: false, item: null, isClosed: state.isClosed || false };
+        state = { view: 'CONTACTS', index: 0, contact: null, chat: [], typing: false, item: null, loading: false, isClosed: state.isClosed || false };
         draw();
         return;
     }
@@ -267,10 +274,11 @@ window.addEventListener('message', function(event) {
                 ],
                 typing: false,
                 item: null,
+                loading: false,
                 isClosed: false
             };
         } else {
-            state = { view: 'CONTACTS', index: 0, contact: null, chat: [], typing: false, item: null, isClosed: false };
+            state = { view: 'CONTACTS', index: 0, contact: null, chat: [], typing: false, item: null, loading: false, isClosed: false };
         }
 
         if (DATA.Time && DATA.Time.Enabled) {

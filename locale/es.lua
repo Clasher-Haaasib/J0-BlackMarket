@@ -12,6 +12,7 @@ L_es = {
     contacts = "CONTACTOS",
     stock_list = "LISTA DE STOCK",
     confirm = "CONFIRMAR",
+    loading = "CARGANDO...",
     market_closed = "MERCADO CERRADO",
     come_back_between = "Vuelve entre",
     typing = "ESCRIBIENDO...",

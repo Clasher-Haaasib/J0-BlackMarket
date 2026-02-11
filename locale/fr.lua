@@ -12,6 +12,7 @@ L_fr = {
     contacts = "CONTACTS",
     stock_list = "LISTE DU STOCK",
     confirm = "CONFIRMER",
+    loading = "CHARGEMENT...",
     market_closed = "MARCHÉ FERMÉ",
     come_back_between = "Revenez entre",
     typing = "EN TAPANT...",

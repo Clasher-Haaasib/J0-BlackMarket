@@ -63,7 +63,6 @@ local function spawnCar(loc, modelName)
     SetModelAsNoLongerNeeded(hash)
     SetVehicleOnGroundProperly(car)
     SetEntityAsMissionEntity(car, true, true)
-    FreezeEntityPosition(car, true)
     currentOrder.vehicle = car
 
     local driverModel = `a_m_m_business_01`

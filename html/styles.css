@@ -172,6 +172,13 @@ body {
     margin-bottom: 5px;
 }
 
+.loading-block {
+    text-align: center;
+    padding: 24px;
+    font-size: 14px;
+    text-transform: uppercase;
+}
+
 .chat-log::-webkit-scrollbar {
     display: none;
 }
