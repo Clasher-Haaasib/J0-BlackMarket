@@ -1,4 +1,9 @@
+
+<img width="1376" height="767" alt="community-clash" src="https://github.com/user-attachments/assets/019248aa-0e45-465b-b1f4-6855c8342099" />
+
 # J0-BlackMarket
+
+## Showcase : https://youtu.be/pWqcfjdhBUg
 
 ## Installation
 
@@ -50,3 +55,9 @@ Edit `shared/config.lua` for contacts, locations, times, and dispatch.
 ---
 
 Enjoy.
+
+
+## Follow Me 
+
+https://tebex.haaasib.dev/
+https://discord.com/invite/9m2KTFskjx
